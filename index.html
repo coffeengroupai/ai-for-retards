@@ -1,0 +1,1501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI for Retards â The AI App Builder</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      background: #0a0a0a;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    }
+    #root {
+      min-height: 100vh;
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.9/babel.min.js"></script>
+  <script type="text/babel">
+    const { useState, useEffect, useRef } = React;
+
+    // ============================================================
+    // THE AI APP BUILDER â From Problem to Working App
+    // 90% Copy-Paste. Every prompt is written for you.
+    // Fill in [BRACKETS], paste, execute. That's it.
+    // ============================================================
+
+    const LEVELS = [
+      {
+        id: 1,
+        name: "Find the Problem",
+        subtitle: "Day 1 â What's broken and who needs it fixed?",
+        icon: "ð",
+        color: "#ef4444",
+        timeEstimate: "1-2 hours",
+        tasks: [
+          {
+            id: "1a",
+            text: "Identify a real problem â paste this into Claude",
+            detail: "Think about your life, your job, your community. What do people complain about? What takes too long? What's confusing? What costs too much?\n\nðï¸ PRO TIP: Copy the prompt below, paste it into Claude, then hit the microphone button and TALK your answers. Don't type â speak. It's 10x faster and Claude understands you perfectly.",
+            prompt: {
+              title: "PROBLEM FINDER â COPY + FILL IN BRACKETS",
+              text: `I want to find a real problem I can solve with an AI app. Here's what I know about:
+
+1. My job/skill: [WHAT YOU DO â fitness coach, barber, teacher, realtor, content creator, etc.]
+2. Problems I see every day: [WHAT PEOPLE AROUND YOU COMPLAIN ABOUT OR STRUGGLE WITH]
+3. Things I help people with already: [WHAT PEOPLE ASK YOU FOR HELP WITH â even informally]
+
+For each problem, rate it 0-10 on:
+- How painful is this problem? (Do people lose sleep, money, or time over it?)
+- How often does it happen? (Daily? Weekly? Once a year?)
+- Could an AI chatbot realistically help with this?
+
+Pick the best one. Tell me WHO has this problem, WHAT it costs them, and WHY an AI tool could fix it. Be brutally honest â if none of these are good, tell me.`,
+            },
+          },
+          {
+            id: "1b",
+            text: "Define who pays â paste this",
+            detail: "A problem without a customer is a hobby. Who actually has this problem bad enough to pay for the fix?",
+            prompt: {
+              title: "WHO PAYS â COPY + FILL IN",
+              text: `The problem I want to solve is: [THE PROBLEM CLAUDE PICKED].
+
+Who are the people who have this problem the WORST? Be specific:
+- What's their job or life situation?
+- Where do they hang out online? (Facebook groups, Reddit, Skool, etc.)
+- What have they already tried to fix this? (Why didn't it work?)
+- How much time or money is this problem costing them?
+- What would they pay for a real solution? ($10? $50? $200?)
+
+Give me a one-sentence description of my ideal customer. Example: "Busy dads who want to get in shape but don't have time for the gym."`,
+            },
+          },
+          {
+            id: "1c",
+            text: "Define your solution â paste this",
+            detail: null,
+            prompt: {
+              title: "YOUR SOLUTION â COPY + FILL IN",
+              text: `PROBLEM: [THE PROBLEM]
+CUSTOMER: [WHO HAS IT]
+
+Now describe the AI app that fixes this. Be specific:
+- What does the user type in or tell the app?
+- What does the app give them back?
+- How is this better than what they're doing now?
+- How long does it take the app to give them an answer?
+
+Describe it like you're explaining it to a 10 year old. No jargon. Just: "You tell it [X], it gives you [Y], and that saves you [Z]."
+
+Rate this solution 0-10. If it's below 7, tell me how to make it better.`,
+            },
+          },
+          {
+            id: "1d",
+            text: "Prove it works once â manually",
+            detail: "Before you build anything, prove the solution works by doing it yourself ONE TIME. Help ONE real person with this problem using your own knowledge. DM someone, hop on a call, text a friend. Get ONE result.",
+            prompt: {
+              title: "FIRST MOVE SCRIPT â DM THIS TO SOMEONE WITH THE PROBLEM",
+              text: `Hey [NAME]! I noticed you [MENTIONED THE PROBLEM / ARE DEALING WITH THE PROBLEM].
+
+I actually help people with this. Would you be down for a quick 10-minute chat? I want to try something â no charge, I just want to see if my method works for your situation.
+
+What does your schedule look like?`,
+            },
+          },
+          {
+            id: "1e",
+            text: "Document the result â paste this AFTER you help someone",
+            detail: null,
+            prompt: {
+              title: "DOCUMENT YOUR PROOF â COPY + FILL IN",
+              text: `I just helped someone manually. Here's what happened:
+
+WHO: [Their name or description]
+THEIR PROBLEM: [What they were struggling with]
+WHAT I TOLD THEM: [The advice/method I gave them]
+THEIR RESULT: [What happened â did it help? How much? How fast?]
+WHAT I'D DO DIFFERENTLY: [Anything I'd change next time]
+
+Based on this, is my solution validated? Rate it 0-10. If it's not a 9, tell me what's missing before I build the app.`,
+            },
+          },
+        ],
+        winCondition: "Screenshot of helping ONE real person and getting a result",
+        encouragement: "You just proved your idea works on a real human. That's more than 99% of people ever do. Post your proof in the AI FOR RETARDS community. ð©¸",
+      },
+      {
+        id: 2,
+        name: "Load the Clip",
+        subtitle: "Day 2-4 â Turn your brain into a database",
+        icon: "ð",
+        color: "#f59e0b",
+        timeEstimate: "4-8 hours (this is the REAL work â don't skip it)",
+        tasks: [
+          {
+            id: "2a",
+            text: "Write your methods â paste this and fill in EVERY bracket",
+            detail: "ðï¸ This level has the most writing. USE VOICE. Paste each prompt into Claude, then tap the mic and just TALK through your answers like you're explaining it to a friend. Claude will write it all down for you. Do NOT try to type all this out on your phone â you'll quit.",
+            prompt: {
+              title: "METHODS TEMPLATE â FILL IN EVERYTHING",
+              text: `MY EXPERTISE:
+I help [WHO] with [WHAT PROBLEM]. I've been doing this for [HOW LONG]. My approach works because [WHAT MAKES IT DIFFERENT].
+
+METHOD 1: [NAME IT]
+- When to use it: [EXACT SITUATION]
+- How it works: [EXPLAIN LIKE YOU'RE TALKING TO A FRIEND â 2-3 SENTENCES]
+- Real example: [A TIME THIS WORKED]
+
+METHOD 2: [NAME IT]
+- When to use it: [EXACT SITUATION]
+- How it works: [2-3 SENTENCES]
+- Real example: [A TIME THIS WORKED]
+
+METHOD 3: [NAME IT]
+- When to use it: [EXACT SITUATION]
+- How it works: [2-3 SENTENCES]
+- Real example: [A TIME THIS WORKED]
+
+(More methods = smarter app. Add as many as you have.)`,
+            },
+          },
+          {
+            id: "2b",
+            text: "Write your decision tree â the if/then rules of your expertise",
+            detail: null,
+            prompt: {
+              title: "DECISION TREE â FILL IN AT LEAST 10",
+              text: `MY DECISION RULES (this is how I think when someone asks for help):
+
+If someone is [SITUATION A] + [SITUATION B] â I recommend [METHOD X] because [WHY]
+If someone is [SITUATION C] + has tried [THING] â I recommend [METHOD Y] because [WHY]
+If someone has [CONSTRAINT â budget, time, etc.] â I start with [SIMPLER METHOD]
+If someone is a [BEGINNER] â I recommend [STARTER APPROACH]
+If someone is [ADVANCED] â I skip to [ADVANCED APPROACH]
+If someone mentions [RED FLAG] â I tell them to see a [PROFESSIONAL] immediately
+If someone asks about [CONTROVERSIAL TOPIC] â my stance is [YOUR HONEST TAKE]
+If someone says "nothing works" â I ask [THESE DIAGNOSTIC QUESTIONS] first
+If someone wants results fast â I recommend [FASTEST METHOD] but warn them [CAVEAT]
+If someone's problem is actually [DIFFERENT THING] â I redirect them to [RIGHT SOLUTION]
+
+(At least 10 rules. More = smarter app.)`,
+            },
+          },
+          {
+            id: "2c",
+            text: "Write 20 real Q&A pairs â questions people actually ask you",
+            detail: "Pull from real DMs, calls, texts, comments. These teach your app to sound like YOU.",
+            prompt: {
+              title: "Q&A PAIRS â WRITE ALL 20",
+              text: `TOP QUESTIONS I GET ASKED (from real conversations):
+
+Q1: "[EXACT QUESTION SOMEONE HAS ASKED YOU]"
+My answer: [YOUR REAL ANSWER â WRITE LIKE YOU'RE TEXTING, NOT WRITING AN ESSAY]
+
+Q2: "[EXACT QUESTION]"
+My answer: [YOUR REAL ANSWER]
+
+Q3: "[EXACT QUESTION]"
+My answer: [YOUR REAL ANSWER]
+
+(Write all 20. Yes, twenty. Pull from DMs, calls, texts, emails, comments. This takes 2-3 hours. This is the part that makes your app sound like you instead of a robot.)
+
+Q4-Q20: [KEEP GOING]`,
+            },
+          },
+          {
+            id: "2d",
+            text: "Write your red flags and honest takes",
+            detail: null,
+            prompt: {
+              title: "RED FLAGS + REAL OPINIONS",
+              text: `RED FLAGS â WHEN MY APP SHOULD STOP AND REFER OUT:
+If someone mentions [X] â tell them: "This is beyond what I can help with. Please see a [PROFESSIONAL]."
+If someone is [DANGEROUS SITUATION] â say: "I can't help with this directly. Contact [RESOURCE]."
+If someone asks [LIABILITY TOPIC] â say: "I can't give [medical/legal/financial] advice. Talk to a [PROFESSIONAL]."
+
+MY HONEST TAKES ON THINGS PEOPLE ARGUE ABOUT:
+Topic 1: [DEBATE IN YOUR FIELD] â I believe: [YOUR REAL OPINION + WHY]
+Topic 2: [ANOTHER DEBATE] â I believe: [YOUR REAL TAKE]
+
+(Your app needs real opinions. Generic = boring = nobody uses it.)`,
+            },
+          },
+          {
+            id: "2e",
+            text: "Upload it all to Claude and get it rated 9/10",
+            detail: null,
+            prompt: {
+              title: "UPLOAD + RATE â PASTE THIS THEN YOUR DATABASE",
+              text: `Read my entire knowledge base below. Don't respond until I say "ready."
+
+[PASTE EVERYTHING â METHODS, DECISION TREE, Q&A PAIRS, RED FLAGS]
+
+Ready.
+
+---
+
+Rate this 0-10 for building an app that:
+1. Sounds like a real person, not a robot
+2. Gives specific advice, not generic fluff
+3. Handles weird questions and edge cases
+4. Knows when to refer someone to a professional
+
+If it's not a 9/10, tell me EXACTLY what's missing. Be harsh.`,
+            },
+          },
+          {
+            id: "2f",
+            text: "Checklist â ALL must be YES",
+            detail: "â At least 3 methods with real examples\nâ At least 10 decision tree rules\nâ At least 20 Q&A pairs in YOUR voice\nâ Red flags and honest opinions included\nâ Claude rated it 9/10\nâ A stranger could do your job from this document",
+          },
+        ],
+        winCondition: "Claude rates your knowledge base 9/10",
+        encouragement: "Your brain is now a database. Everything you know â organized and ready to power an AI. Post your 9/10 screenshot in the AI FOR RETARDS community.",
+      },
+      {
+        id: 3,
+        name: "Lock and Load",
+        subtitle: "Day 4-5 â Reverse prompt your build plan",
+        icon: "ð¯",
+        color: "#22c55e",
+        timeEstimate: "1-2 hours",
+        tasks: [
+          {
+            id: "3a",
+            text: "Tell Claude the end result â paste this",
+            detail: null,
+            prompt: {
+              title: "REVERSE PROMPT â COPY + FILL IN",
+              text: `I want to build an AI-powered app. Here's my situation:
+
+WHO I HELP: [YOUR CUSTOMER]
+THEIR PROBLEM: [THE PROBLEM FROM LEVEL 1]
+MY SOLUTION: [WHAT THE APP DOES â from Level 1]
+
+The end result I want: [DESCRIBE EXACTLY WHAT THE FINISHED APP LOOKS LIKE â what the user sees, what they type, what they get back, how it feels to use it]
+
+I don't know how to code. I need to build this using Claude only. Help me get there.`,
+            },
+          },
+          {
+            id: "3b",
+            text: "Make Claude rate the plan â paste this AFTER it responds",
+            detail: null,
+            prompt: {
+              title: "RATE IT â PASTE THIS",
+              text: `Rate this plan 0-10. 0 = garbage. 10 = bulletproof. Be honest. What's weak?`,
+            },
+          },
+          {
+            id: "3c",
+            text: "Push to a 9 â one line",
+            detail: "It'll rate itself 4-6. Normal. One line fixes it.",
+            prompt: {
+              title: "PUSH TO 9 â PASTE THIS",
+              text: `Get this to a 9 out of 10. Fix every weakness you just identified.`,
+            },
+          },
+          {
+            id: "3d",
+            text: "Start building step by step â paste this",
+            detail: null,
+            prompt: {
+              title: "BUILD STEP BY STEP â PASTE THIS",
+              text: `I like this plan. Build step 1 ONLY. After step 1 is done, rate it 0-10 and fix it until it's a 9. Don't move to step 2 until step 1 is a 9.`,
+            },
+          },
+          {
+            id: "3e",
+            text: "Power move: Army Framework for bulletproof instructions",
+            detail: "TASK = What to build. CONDITION = The rules. STANDARD = What done looks like. REPERCUSSION = Redo if wrong.",
+            prompt: {
+              title: "ARMY FRAMEWORK â COPY + FILL IN",
+              text: `TASK: Build a [APP TYPE] that [WHAT IT DOES].
+CONDITION: I can't code. Use Claude only. Must work on phones. Must be simple enough for [YOUR CUSTOMER] to use without help.
+STANDARD: [EXACTLY WHAT "DONE RIGHT" LOOKS LIKE â what the user sees, what happens when they tap things, how fast it responds, what the output looks like]
+REPERCUSSION: If any step doesn't meet the standard, redo it. Don't skip ahead. Don't give me half-finished work.`,
+            },
+          },
+        ],
+        winCondition: "Screenshot of your 9/10 rated plan from Claude",
+        encouragement: "You just reverse-prompted a 9/10 plan out of AI. That's a skill most people don't know exists. Post it in the AI FOR RETARDS community.",
+      },
+      {
+        id: 4,
+        name: "Build the Weapon",
+        subtitle: "Day 5-7 â Get a working app",
+        icon: "â¡",
+        color: "#3b82f6",
+        timeEstimate: "3-5 hours",
+        tasks: [
+          {
+            id: "4a",
+            text: "Build your system prompt â paste this",
+            detail: null,
+            prompt: {
+              title: "SYSTEM PROMPT BUILDER â COPY + FILL IN",
+              text: `Using my knowledge base, write a system prompt for an AI app that acts as my assistant. The app should:
+
+1. Greet the user and ask about their specific situation
+2. Ask 2-3 follow-up questions BEFORE giving advice
+3. Give specific advice using ONLY my methods and rules â never make stuff up
+4. Sound like me â [DESCRIBE YOUR TONE: casual? direct? funny? professional?]
+5. If someone asks about [RED FLAG TOPICS], tell them to see a [SPECIALIST]
+6. End every response with ONE specific thing the person can do TODAY
+7. If asked something outside my area, say "That's not what I help with" and redirect
+
+Rate it 0-10. Get it to a 9.`,
+            },
+          },
+          {
+            id: "4b",
+            text: "Run the 10-Question Gauntlet â test every type of question",
+            detail: "Ask your app each one. Score each answer 0-10. Fix anything below 7.\n\n1. Basic question any user would ask\n2. Your most popular method\n3. Your least known method\n4. A question where the answer depends (should ask follow-ups)\n5. Controversial topic (should match YOUR stance)\n6. Outside your expertise (should say 'not my area')\n7. Safety/medical/legal question (should refer to professional)\n8. Wrong assumptions (should gently correct)\n9. Same question asked differently (should be consistent)\n10. 'Nothing works for me' (should show empathy + give next steps)",
+          },
+          {
+            id: "4c",
+            text: "Fix every weak answer â paste this for each one below 7",
+            detail: null,
+            prompt: {
+              title: "FIX ANSWERS â PASTE FOR EACH",
+              text: `That answer was a [SCORE]/10. Here's what was wrong: [WHAT YOU DIDN'T LIKE].
+
+Fix it. Make it sound like me. Get it to a 9.`,
+            },
+          },
+          {
+            id: "4d",
+            text: "Build the full app interface â paste this",
+            detail: null,
+            prompt: {
+              title: "BUILD THE APP â COPY THIS EXACTLY",
+              text: `Build this as a complete web app. Create one HTML file with everything included. The app needs:
+
+- Clean chat interface that works on phones and computers
+- App name at the top: "[YOUR APP NAME]"
+- Text box where users type questions
+- "Copy Response" button on every answer so users can save it
+- "Download Full Chat" button to save the whole conversation
+- Professional design â clean colors, easy to read, mobile-first
+- A short description under the name explaining what the app does in one sentence
+- Disclaimer at the bottom: "[YOUR NAME]'s [TOPIC] Assistant provides general guidance. Not a substitute for professional advice."
+
+Rate the design 0-10 and get it to a 9.`,
+            },
+          },
+        ],
+        winCondition: "All 10 test answers rated 7+ and the app looks professional",
+        encouragement: "You just built a working AI app that TALKS like you and THINKS like you. Most people will never do this. Screenshot it answering a question and post it in the AI FOR RETARDS community. ð¥",
+      },
+      {
+        id: 5,
+        name: "Go Live",
+        subtitle: "Day 7-9 â Put it on the internet",
+        icon: "ð",
+        color: "#8b5cf6",
+        timeEstimate: "3-5 hours (HARDEST level â grab coffee, block time)",
+        tasks: [
+          {
+            id: "5a",
+            text: "Create a Replit account (Google sign-up, 30 seconds)",
+            detail: "ð Use this link to sign up: replit.com/refer/coffeengroupai\n\nThis gives you a free account. Sign in with Google â takes 30 seconds.",
+          },
+          {
+            id: "5b",
+            text: "Get your deployment code â paste this",
+            detail: null,
+            prompt: {
+              title: "GET CODE â COPY THIS",
+              text: `Give me the COMPLETE code for my app. Put EVERYTHING in one single HTML file â all CSS, JavaScript, and HTML together. I'm going to paste this into Replit. Include the copy button, download button, and disclaimer. Make sure it works on mobile.`,
+            },
+          },
+          {
+            id: "5c",
+            text: "Deploy: Create Repl â HTML/CSS/JS â paste code â Run",
+            detail: "1. Click 'Create Repl'\n2. Choose 'HTML, CSS, JS'\n3. Delete everything in index.html\n4. Paste Claude's code\n5. Click the green Run button\n6. Copy your live URL â your app is now on the internet",
+          },
+          {
+            id: "5c2",
+            text: "ð± PHONE-ONLY? Read this first",
+            detail: "Replit works on your phone but pasting long code is tricky. Here's how to make it painless:\n\n1. Open Claude in one browser tab, Replit in another\n2. Ask Claude to split the code into 3 SHORT chunks instead of one giant file\n3. Paste each chunk one at a time â don't try to paste 200 lines at once\n4. If you accidentally delete something, hit Undo (shake your phone on iPhone, or tap the â© arrow)\n5. If NOTHING works â ask Claude: 'Give me a Replit import link for my project' â some Replit templates let you fork with one tap\n\nAlternative: If you have access to ANY computer (library, friend's laptop, work computer) â do Level 5 there. It takes 20 minutes on a computer vs 90 on a phone.",
+          },
+          {
+            id: "5d",
+            text: "ð¨ STUCK? Panic Button â paste this into Claude",
+            detail: "Level 5 is the hardest. If you're staring at a screen that makes no sense â DON'T QUIT. Paste this. Also post in the AI FOR RETARDS community â someone has been where you are.",
+            prompt: {
+              title: "ð¨ PANIC BUTTON â COPY THIS",
+              text: `I'm trying to deploy my app on Replit and I'm stuck. Here's exactly what I see on my screen:
+
+[DESCRIBE: what page you're on, what buttons you see, any error messages, anything red or confusing]
+
+I don't know how to code. Tell me EXACTLY what to click, in order, like I'm 10 years old. Numbered steps. If I need to copy-paste something, show me the exact text and tell me exactly where it goes. Skip nothing.`,
+            },
+          },
+          {
+            id: "5e",
+            text: "Test it on your phone â send the link to yourself and try it",
+            detail: "Open your live URL on your phone. Does it load? Does the chat work? Can you copy responses? Does the download button work? If anything is broken, tell Claude what's wrong and paste the fix.",
+          },
+          {
+            id: "5f",
+            text: "Keep your app awake â paste this",
+            detail: "Free Replit apps go to sleep after a few minutes of no use. First load takes 10-15 seconds while it wakes up. This confuses users. Here's the fix:",
+            prompt: {
+              title: "KEEP APP AWAKE â COPY THIS",
+              text: `My app is hosted on Replit's free tier. It goes to sleep when nobody uses it and takes 10-15 seconds to load the first time.
+
+Add a loading screen to my app that says: "Loading [YOUR APP NAME]... (first load takes a few seconds)" so users don't think it's broken.
+
+Also â what's the cheapest way to keep my Replit app from going to sleep? Give me options from free to cheap.`,
+            },
+          },
+        ],
+        winCondition: "A live URL that works on your phone and computer",
+        encouragement: "YOUR APP IS LIVE ON THE INTERNET. You built it. It works. Real people can use it right now. Post your link in the AI FOR RETARDS community. ð",
+      },
+      {
+        id: 6,
+        name: "Bulletproof It",
+        subtitle: "Day 9-10 â Make it secure and unbreakable",
+        icon: "ð¡ï¸",
+        color: "#06b6d4",
+        timeEstimate: "2-3 hours",
+        tasks: [
+          {
+            id: "6a",
+            text: "Add email-gated access â paste this",
+            detail: "Right now anyone with your link can use your app. Lock it down so only the people you approve can get in.",
+            prompt: {
+              title: "ADD EMAIL GATE â COPY THIS",
+              text: `Add email verification to my app. Before anyone can use it, they enter their email. Check it against a list of approved emails that I control.
+
+If their email ISN'T approved, show: "This app is invite-only right now. Request access at [YOUR EMAIL or FORM LINK]."
+
+If their email IS approved, let them in. Simple â no passwords, just email check. I'll add emails manually for now.`,
+            },
+          },
+          {
+            id: "6b",
+            text: "Add rate limiting â paste this to protect your API costs",
+            detail: null,
+            prompt: {
+              title: "ADD RATE LIMIT â COPY THIS",
+              text: `Add a daily message limit to my app. Each user gets 50 messages per day. After 50, show: "You've used all your questions for today. Come back tomorrow!"
+
+This prevents one person from running up my API bill.`,
+            },
+          },
+          {
+            id: "6c",
+            text: "Test 5 edge cases",
+            detail: "1. Close the chat and come back â does it handle it?\n2. Ask a question completely outside your topic â does it redirect?\n3. Ask something dangerous/medical/legal â does it refer to a professional?\n4. Type gibberish â does it respond gracefully?\n5. Test on a DIFFERENT phone/computer â does it still work?",
+          },
+          {
+            id: "6d",
+            text: "Add a feedback link â paste this",
+            detail: null,
+            prompt: {
+              title: "ADD FEEDBACK â COPY THIS",
+              text: `Add a small link at the bottom of my app that says "Something wrong? Tell me" that opens an email to [YOUR EMAIL] with subject line "App Feedback". Keep it subtle â just a small text link under the disclaimer.`,
+            },
+          },
+          {
+            id: "6e",
+            text: "Final quality check â paste this into Claude",
+            detail: null,
+            prompt: {
+              title: "QUALITY AUDIT â COPY THIS",
+              text: `I just finished building my app. Rate it on these 5 things, each 0-10:
+
+1. SECURITY: Is it locked to approved users only? Is there rate limiting? Are there any ways to abuse it?
+2. FUNCTIONALITY: Does it answer questions accurately? Does copy/download work? Does it handle edge cases?
+3. USABILITY: Is it easy to use on a phone? Is the design clean? Could a non-tech person figure it out in 10 seconds?
+4. RELIABILITY: Will it crash with 10 users? 50? What breaks first?
+5. VOICE: Does it sound like a real person or a robot? Does it have real opinions?
+
+If ANY score is below 8, tell me exactly how to fix it. I want a 9/10 overall.`,
+            },
+          },
+        ],
+        winCondition: "Claude rates your app 9/10 on the quality audit",
+        encouragement: "Your app is secure, functional, and sounds like you. It's not a toy â it's a real tool that solves a real problem. Post your 9/10 audit in the AI FOR RETARDS community. ð¡ï¸",
+      },
+      {
+        id: 7,
+        name: "Proof of Concept",
+        subtitle: "Day 10-14 â Get 5 real people to use it and prove it works",
+        icon: "ð¬",
+        color: "#eab308",
+        timeEstimate: "3-5 days",
+        tasks: [
+          {
+            id: "7a",
+            text: "Send your app to the person you helped in Level 1",
+            detail: "They already trust you. They already have the problem. They're your first real user.",
+            prompt: {
+              title: "FIRST USER MESSAGE â COPY THIS",
+              text: `Hey [NAME]! Remember when I helped you with [THEIR PROBLEM]?
+
+I actually built an app that does what I did for you â but available 24/7. I'd love for you to try it and tell me honestly:
+1. Was it helpful?
+2. What was confusing?
+3. What's missing?
+
+Here's the link: [YOUR APP URL]
+Your email is already approved. Just enter [THEIR EMAIL] and you're in.
+
+Be honest â I need real feedback, not compliments.`,
+            },
+          },
+          {
+            id: "7b",
+            text: "Send it to 4 more people â paste this to each one",
+            detail: "Friends, coworkers, family members who have the problem, people from online communities. Get to 5 total testers.",
+            prompt: {
+              title: "BETA TESTER OUTREACH â COPY + CUSTOMIZE",
+              text: `Hey [NAME]! I just built an AI app that helps [WHO] with [PROBLEM]. It [WHAT IT DOES â one sentence].
+
+I'm looking for 5 people to test it and give me real feedback. It's free â I just need you to try it and tell me what works and what doesn't.
+
+Want to be one of my testers? Takes about 5 minutes to try.`,
+            },
+          },
+          {
+            id: "7c",
+            text: "Collect feedback from all 5 â paste this to each tester",
+            detail: null,
+            prompt: {
+              title: "FEEDBACK REQUEST â COPY THIS",
+              text: `Hey [NAME]! Did you get a chance to try the app? I'd love to hear:
+
+1. What was your first impression? (Be honest)
+2. Did it give you useful advice?
+3. Was anything confusing or hard to find?
+4. Would you use this again?
+5. What would make it better?
+
+Even a voice memo or a few sentences helps. Thanks for testing it.`,
+            },
+          },
+          {
+            id: "7d",
+            text: "Fix everything they found â paste this for each issue",
+            detail: null,
+            prompt: {
+              title: "FIX BASED ON FEEDBACK â PASTE FOR EACH ISSUE",
+              text: `A real user tested my app. Here's their feedback:
+
+[PASTE THEIR FEEDBACK]
+
+Fix this. The user should never hit this issue again. If this requires changing the system prompt, change it. If it requires changing the interface, change it. Rate the fix 0-10.`,
+            },
+          },
+          {
+            id: "7d2",
+            text: "Update your knowledge base â close the loop",
+            detail: "Your users just told you what's missing. Feed it back into your app so it gets smarter every week.",
+            prompt: {
+              title: "UPDATE KNOWLEDGE BASE â PASTE AFTER EVERY ROUND OF FEEDBACK",
+              text: `My users gave me feedback. Here are the questions my app couldn't answer well, or topics it was missing:
+
+[PASTE THE FEEDBACK / QUESTIONS USERS ASKED THAT GOT WEAK ANSWERS]
+
+Write new Q&A pairs for each one in my voice. Match the tone and style of my existing knowledge base. Then update my system prompt to include these.
+
+After updating, run the 10-Question Gauntlet again with these new topics. Rate each answer 0-10. Fix anything below 8.`,
+            },
+          },
+          {
+            id: "7e",
+            text: "Get your proof â collect results and testimonials",
+            detail: null,
+            prompt: {
+              title: "COLLECT PROOF â SEND THIS TO TESTERS WHO HAD GOOD RESULTS",
+              text: `Hey [NAME]! So glad the app helped with [THEIR PROBLEM].
+
+Would you mind sending me 2-3 sentences about your experience? Something like what you were dealing with before and what changed after using it.
+
+Even just a quick text works. It would mean a lot.`,
+            },
+          },
+        ],
+        winCondition: "5 real people used your app + you have at least 2 testimonials",
+        encouragement: "5 real humans used something YOU built â and it helped them. You have proof it works. That's not a project. That's the foundation of a business whenever you're ready.\n\nPost your testimonials in the AI FOR RETARDS community. Show them what you built. ð",
+      },
+    ];
+
+    // App quality tracking section
+    const REALISTIC_NUMBERS = {
+      title: "YOUR APP SCORECARD",
+      stats: [
+        { label: "Problem clarity (Level 1 â can you explain it in one sentence?)", result: "â¬ Not yet  â¬ Getting there  â Nailed it" },
+        { label: "Customer identified (Level 1 â do you know WHO pays?)", result: "â¬ Not yet  â¬ Getting there  â Nailed it" },
+        { label: "Knowledge base loaded (Level 2 â 30+ real Q&A pairs)", result: "â¬ 0-10  â¬ 11-29  â 30+" },
+        { label: "Chatbot built and running (Level 4 â live on Replit)", result: "â¬ Not started  â¬ Errors  â Running" },
+        { label: "Security locked down (Level 6 â email gate + rate limit)", result: "â¬ Open to anyone  â¬ Partially locked  â Fully secured" },
+        { label: "Real users testing it (Level 7 â 5 people using it)", result: "â¬ 0 users  â¬ 1-4 users  â 5+ users" },
+        { label: "APP QUALITY RATING", result: "Target: 9 out of 10" },
+      ],
+      milestones: [
+        { time: "Day 1-2", goal: "Find the Problem â identify a real pain point and the person who pays to fix it" },
+        { time: "Day 3-5", goal: "Load the Knowledge â collect 30+ real Q&A pairs from research and interviews" },
+        { time: "Day 6-7", goal: "Structure Your Prompt â build a Claude system prompt that answers like an expert" },
+        { time: "Day 8-12", goal: "Build the App â deploy a working chatbot on Replit with Claude API" },
+        { time: "Day 13-15", goal: "Go Live â get a public link, test it yourself, fix obvious bugs" },
+        { time: "Day 16-20", goal: "Bulletproof It â add email gate, rate limiting, error handling, speed fixes" },
+        { time: "Day 21-25", goal: "Proof of Concept â get 5 real users, collect 2 testimonials, score 9/10" },
+      ],
+      diagnostics: [
+        { problem: "Can't think of a problem to solve", fix: "Think smaller â What do YOU Google every week? What do your friends complain about?" },
+        { problem: "Chatbot gives wrong or generic answers", fix: "Weak knowledge base â Go back to Level 2, add more specific Q&A pairs from real sources" },
+        { problem: "App won't deploy or shows errors", fix: "Code issue â Copy the EXACT error into Claude and say 'fix this error in my Replit app'" },
+        { problem: "App is slow or times out", fix: "Too much per request â Use the Speed Fix prompt in Level 6 to optimize response handling" },
+        { problem: "Nobody wants to test it", fix: "Wrong audience â Ask the person who HAS the problem, not your friends" },
+        { problem: "Users say it's not helpful", fix: "Knowledge gaps â Ask users 'what did you want it to answer?' then add those Q&As to Level 2" },
+        { problem: "App was good at first but users stopped coming back", fix: "Stale knowledge â Use the Update Knowledge Base prompt in Level 7 after every round of feedback. Your app should get smarter every week." },
+        { problem: "First load is slow or app seems broken", fix: "Replit sleep mode â Add a loading screen (Level 5) so users know it's waking up, not broken" },
+      ],
+    };
+
+    function CopyButton({ text }) {
+      const [copied, setCopied] = useState(false);
+      const handleCopy = () => {
+        navigator.clipboard.writeText(text).then(() => {
+          setCopied(true);
+          setTimeout(() => setCopied(false), 2000);
+        });
+      };
+      return (
+        <button
+          onClick={handleCopy}
+          style={{
+            padding: "10px 20px",
+            background: copied ? "#22c55e" : "#f59e0b",
+            color: "#000",
+            border: "none",
+            borderRadius: 8,
+            fontWeight: 700,
+            fontSize: 14,
+            cursor: "pointer",
+            width: "100%",
+            marginTop: 8,
+            transition: "all 0.2s",
+          }}
+        >
+          {copied ? "COPIED â" : "TAP TO COPY"}
+        </button>
+      );
+    }
+
+    function PromptCard({ prompt }) {
+      const [open, setOpen] = useState(false);
+      return (
+        <div style={{ marginTop: 8 }}>
+          <button
+            onClick={() => setOpen(!open)}
+            style={{
+              background: "rgba(245,158,11,0.15)",
+              border: "1px solid rgba(245,158,11,0.4)",
+              borderRadius: 8,
+              padding: "10px 14px",
+              color: "#f59e0b",
+              fontWeight: 600,
+              fontSize: 13,
+              cursor: "pointer",
+              width: "100%",
+              textAlign: "left",
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
+            <span>ð {prompt.title}</span>
+            <span style={{ fontSize: 18 }}>{open ? "â" : "+"}</span>
+          </button>
+          {open && (
+            <div
+              style={{
+                background: "rgba(0,0,0,0.4)",
+                borderRadius: 8,
+                padding: 14,
+                marginTop: 6,
+                border: "1px solid rgba(255,255,255,0.1)",
+              }}
+            >
+              <pre
+                style={{
+                  whiteSpace: "pre-wrap",
+                  wordBreak: "break-word",
+                  fontSize: 13,
+                  lineHeight: 1.6,
+                  color: "#e5e7eb",
+                  margin: 0,
+                  fontFamily: "inherit",
+                }}
+              >
+                {prompt.text}
+              </pre>
+              <CopyButton text={prompt.text} />
+              <div style={{ fontSize: 11, color: "rgba(139,92,246,0.7)", marginTop: 6, textAlign: "center" }}>
+                ðï¸ Paste this into Claude, then use VOICE to fill in the [BRACKETS] â way faster than typing
+              </div>
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    function TaskItem({ task, checked, onToggle, locked }) {
+      return (
+        <div
+          style={{
+            display: "flex",
+            gap: 12,
+            padding: "12px 0",
+            borderBottom: "1px solid rgba(255,255,255,0.06)",
+            opacity: locked ? 0.4 : 1,
+          }}
+        >
+          <button
+            onClick={() => !locked && onToggle(task.id)}
+            style={{
+              width: 24,
+              height: 24,
+              minWidth: 24,
+              borderRadius: 6,
+              border: checked
+                ? "2px solid #22c55e"
+                : "2px solid rgba(255,255,255,0.3)",
+              background: checked ? "#22c55e" : "transparent",
+              cursor: locked ? "default" : "pointer",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              color: "#000",
+              fontWeight: 700,
+              fontSize: 14,
+              marginTop: 2,
+              transition: "all 0.2s",
+            }}
+          >
+            {checked ? "â" : ""}
+          </button>
+          <div style={{ flex: 1 }}>
+            <div
+              style={{
+                fontSize: 15,
+                color: checked ? "rgba(255,255,255,0.5)" : "#f3f4f6",
+                textDecoration: checked ? "line-through" : "none",
+                lineHeight: 1.5,
+              }}
+            >
+              {task.text}
+            </div>
+            {task.detail && (
+              <div
+                style={{
+                  fontSize: 13,
+                  color: "rgba(255,255,255,0.4)",
+                  marginTop: 6,
+                  lineHeight: 1.6,
+                  whiteSpace: "pre-line",
+                }}
+              >
+                {task.detail}
+              </div>
+            )}
+            {task.prompt && <PromptCard prompt={task.prompt} />}
+          </div>
+        </div>
+      );
+    }
+
+    function LevelCard({ level, isActive, isComplete, isLocked, progress, onClick }) {
+      return (
+        <button
+          onClick={() => !isLocked && onClick(level)}
+          style={{
+            width: "100%",
+            padding: "16px",
+            background: isActive
+              ? `linear-gradient(135deg, ${level.color}22, ${level.color}11)`
+              : isComplete
+              ? "rgba(34,197,94,0.08)"
+              : "rgba(255,255,255,0.03)",
+            border: isActive
+              ? `2px solid ${level.color}`
+              : isComplete
+              ? "2px solid rgba(34,197,94,0.3)"
+              : "1px solid rgba(255,255,255,0.08)",
+            borderRadius: 12,
+            cursor: isLocked ? "default" : "pointer",
+            textAlign: "left",
+            opacity: isLocked ? 0.35 : 1,
+            transition: "all 0.2s",
+            marginBottom: 8,
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+            <span style={{ fontSize: 24 }}>
+              {isComplete ? "â" : isLocked ? "ð" : level.icon}
+            </span>
+            <div style={{ flex: 1 }}>
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 8,
+                }}
+              >
+                <span
+                  style={{
+                    fontSize: 11,
+                    fontWeight: 700,
+                    color: level.color,
+                    textTransform: "uppercase",
+                    letterSpacing: 1,
+                  }}
+                >
+                  Level {Number.isInteger(level.id) ? level.id : level.id === 5.5 ? "5.5" : `7.${String(level.id).split(".")[1]}`}
+                </span>
+              </div>
+              <div
+                style={{
+                  fontSize: 16,
+                  fontWeight: 700,
+                  color: "#f3f4f6",
+                  marginTop: 2,
+                }}
+              >
+                {level.name}
+              </div>
+              <div
+                style={{
+                  fontSize: 13,
+                  color: "rgba(255,255,255,0.5)",
+                  marginTop: 2,
+                }}
+              >
+                {level.subtitle}
+              </div>
+            </div>
+            {!isLocked && !isComplete && (
+              <div
+                style={{
+                  fontSize: 12,
+                  color: "rgba(255,255,255,0.4)",
+                  textAlign: "right",
+                }}
+              >
+                {progress}/{level.tasks.length}
+              </div>
+            )}
+          </div>
+          {!isLocked && !isComplete && (
+            <div
+              style={{
+                height: 4,
+                background: "rgba(255,255,255,0.1)",
+                borderRadius: 2,
+                marginTop: 12,
+                overflow: "hidden",
+              }}
+            >
+              <div
+                style={{
+                  height: "100%",
+                  width: `${(progress / level.tasks.length) * 100}%`,
+                  background: level.color,
+                  borderRadius: 2,
+                  transition: "width 0.3s",
+                }}
+              />
+            </div>
+          )}
+        </button>
+      );
+    }
+
+    function NumbersView() {
+      return (
+        <div style={{ padding: 20 }}>
+          <h2
+            style={{
+              fontSize: 20,
+              fontWeight: 800,
+              color: "#f3f4f6",
+              marginBottom: 4,
+            }}
+          >
+            ð {REALISTIC_NUMBERS.title}
+          </h2>
+          <p style={{ fontSize: 13, color: "rgba(255,255,255,0.5)", marginBottom: 20 }}>
+            Realistic expectations so you don't quit too early.
+          </p>
+
+          <div style={{ marginBottom: 24 }}>
+            <h3 style={{ fontSize: 14, fontWeight: 700, color: "#f59e0b", marginBottom: 12 }}>
+              CONVERSION REALITY
+            </h3>
+            {REALISTIC_NUMBERS.stats.map((s, i) => (
+              <div
+                key={i}
+                style={{
+                  padding: "10px 14px",
+                  background: "rgba(255,255,255,0.03)",
+                  borderRadius: 8,
+                  marginBottom: 6,
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  flexWrap: "wrap",
+                  gap: 8,
+                }}
+              >
+                <span style={{ fontSize: 13, color: "rgba(255,255,255,0.6)" }}>
+                  {s.label}
+                </span>
+                <span style={{ fontSize: 13, fontWeight: 700, color: "#f3f4f6" }}>
+                  â {s.result}
+                </span>
+              </div>
+            ))}
+          </div>
+
+          <div style={{ marginBottom: 24 }}>
+            <h3 style={{ fontSize: 14, fontWeight: 700, color: "#22c55e", marginBottom: 12 }}>
+              SUCCESS MILESTONES
+            </h3>
+            {REALISTIC_NUMBERS.milestones.map((m, i) => (
+              <div
+                key={i}
+                style={{
+                  padding: "10px 14px",
+                  background: "rgba(34,197,94,0.06)",
+                  borderRadius: 8,
+                  marginBottom: 6,
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  flexWrap: "wrap",
+                  gap: 8,
+                }}
+              >
+                <span style={{ fontSize: 13, fontWeight: 700, color: "#22c55e" }}>
+                  {m.time}
+                </span>
+                <span style={{ fontSize: 13, color: "rgba(255,255,255,0.7)" }}>
+                  {m.goal}
+                </span>
+              </div>
+            ))}
+          </div>
+
+          <div>
+            <h3 style={{ fontSize: 14, fontWeight: 700, color: "#ef4444", marginBottom: 12 }}>
+              IF SOMETHING'S NOT WORKING
+            </h3>
+            {REALISTIC_NUMBERS.diagnostics.map((d, i) => (
+              <div
+                key={i}
+                style={{
+                  padding: "10px 14px",
+                  background: "rgba(239,68,68,0.06)",
+                  borderRadius: 8,
+                  marginBottom: 6,
+                }}
+              >
+                <div style={{ fontSize: 13, color: "#ef4444", fontWeight: 600 }}>
+                  {d.problem}
+                </div>
+                <div style={{ fontSize: 13, color: "rgba(255,255,255,0.6)", marginTop: 4 }}>
+                  {d.fix}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+    }
+
+    function App() {
+      const [checkedTasks, setCheckedTasks] = useState({});
+      const [activeLevel, setActiveLevel] = useState(null);
+      const [showNumbers, setShowNumbers] = useState(false);
+      const [showEncouragement, setShowEncouragement] = useState(null);
+      const contentRef = useRef(null);
+
+      const getLevelProgress = (level) => {
+        return level.tasks.filter((t) => checkedTasks[t.id]).length;
+      };
+
+      const isLevelComplete = (level) => {
+        return level.tasks.every((t) => checkedTasks[t.id]);
+      };
+
+      const isLevelUnlocked = (level, index) => {
+        if (index === 0) return true;
+        return isLevelComplete(LEVELS[index - 1]);
+      };
+
+      const totalTasks = LEVELS.reduce((sum, l) => sum + l.tasks.length, 0);
+      const completedTasks = Object.values(checkedTasks).filter(Boolean).length;
+      const overallProgress = totalTasks > 0 ? (completedTasks / totalTasks) * 100 : 0;
+
+      const handleToggle = (taskId) => {
+        setCheckedTasks((prev) => ({ ...prev, [taskId]: !prev[taskId] }));
+      };
+
+      useEffect(() => {
+        if (activeLevel) {
+          const levelObj = LEVELS.find((l) => l.id === activeLevel.id);
+          if (levelObj && isLevelComplete(levelObj) && levelObj.encouragement) {
+            setShowEncouragement(levelObj);
+          }
+        }
+      }, [checkedTasks, activeLevel]);
+
+      const scrollToTop = () => {
+        if (contentRef.current) contentRef.current.scrollTop = 0;
+      };
+
+      if (showEncouragement) {
+        const level = showEncouragement;
+        return (
+          <div
+            style={{
+              maxWidth: 480,
+              margin: "0 auto",
+              minHeight: "100vh",
+              background: "#0a0a0a",
+              color: "#f3f4f6",
+              fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+              padding: 40,
+              textAlign: "center",
+            }}
+          >
+            <div style={{ fontSize: 64, marginBottom: 24 }}>ð</div>
+            <div
+              style={{
+                fontSize: 12,
+                fontWeight: 700,
+                color: level.color,
+                textTransform: "uppercase",
+                letterSpacing: 2,
+                marginBottom: 8,
+              }}
+            >
+              Level Complete
+            </div>
+            <div
+              style={{
+                fontSize: 28,
+                fontWeight: 800,
+                marginBottom: 24,
+                lineHeight: 1.3,
+              }}
+            >
+              {level.name}
+            </div>
+            <div
+              style={{
+                fontSize: 16,
+                color: "rgba(255,255,255,0.7)",
+                lineHeight: 1.8,
+                maxWidth: 360,
+                whiteSpace: "pre-line",
+              }}
+            >
+              {level.encouragement}
+            </div>
+            <button
+              onClick={() => {
+                setShowEncouragement(null);
+                setActiveLevel(null);
+              }}
+              style={{
+                marginTop: 32,
+                padding: "14px 32px",
+                background: level.color,
+                color: "#000",
+                border: "none",
+                borderRadius: 10,
+                fontWeight: 700,
+                fontSize: 16,
+                cursor: "pointer",
+              }}
+            >
+              NEXT LEVEL â
+            </button>
+          </div>
+        );
+      }
+
+      if (activeLevel) {
+        const level = activeLevel;
+        const levelIndex = LEVELS.findIndex((l) => l.id === level.id);
+        const locked = !isLevelUnlocked(level, levelIndex);
+        const progress = getLevelProgress(level);
+        const complete = isLevelComplete(level);
+
+        return (
+          <div
+            ref={contentRef}
+            style={{
+              maxWidth: 480,
+              margin: "0 auto",
+              minHeight: "100vh",
+              background: "#0a0a0a",
+              color: "#f3f4f6",
+              fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+              overflowY: "auto",
+            }}
+          >
+            <div
+              style={{
+                padding: "16px 20px",
+                borderBottom: "1px solid rgba(255,255,255,0.08)",
+                display: "flex",
+                alignItems: "center",
+                gap: 12,
+                position: "sticky",
+                top: 0,
+                background: "#0a0a0a",
+                zIndex: 10,
+              }}
+            >
+              <button
+                onClick={() => setActiveLevel(null)}
+                style={{
+                  background: "none",
+                  border: "none",
+                  color: "#f3f4f6",
+                  fontSize: 20,
+                  cursor: "pointer",
+                  padding: "4px 8px",
+                }}
+              >
+                â
+              </button>
+              <div style={{ flex: 1 }}>
+                <div
+                  style={{
+                    fontSize: 11,
+                    fontWeight: 700,
+                    color: level.color,
+                    textTransform: "uppercase",
+                    letterSpacing: 1,
+                  }}
+                >
+                  Level {Number.isInteger(level.id) ? level.id : level.id === 5.5 ? "5.5" : `7.${String(level.id).split(".")[1]}`}
+                </div>
+                <div style={{ fontSize: 16, fontWeight: 700 }}>{level.name}</div>
+              </div>
+              <span style={{ fontSize: 24 }}>{complete ? "â" : level.icon}</span>
+            </div>
+
+            <div style={{ padding: 20 }}>
+              <div
+                style={{
+                  fontSize: 14,
+                  color: "rgba(255,255,255,0.5)",
+                  marginBottom: 6,
+                }}
+              >
+                {level.subtitle}
+              </div>
+              <div
+                style={{
+                  fontSize: 12,
+                  color: "rgba(255,255,255,0.3)",
+                  marginBottom: 20,
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 6,
+                }}
+              >
+                â± {level.timeEstimate}
+              </div>
+
+              <div
+                style={{
+                  height: 6,
+                  background: "rgba(255,255,255,0.1)",
+                  borderRadius: 3,
+                  marginBottom: 24,
+                  overflow: "hidden",
+                }}
+              >
+                <div
+                  style={{
+                    height: "100%",
+                    width: `${(progress / level.tasks.length) * 100}%`,
+                    background: level.color,
+                    borderRadius: 3,
+                    transition: "width 0.3s",
+                  }}
+                />
+              </div>
+
+              {level.tasks.map((task) => (
+                <TaskItem
+                  key={task.id}
+                  task={task}
+                  checked={!!checkedTasks[task.id]}
+                  onToggle={handleToggle}
+                  locked={locked}
+                />
+              ))}
+
+              {level.prompt && (
+                <div style={{ marginTop: 20 }}>
+                  <PromptCard prompt={level.prompt} />
+                </div>
+              )}
+
+              <div
+                style={{
+                  marginTop: 24,
+                  padding: 16,
+                  background: complete
+                    ? "rgba(34,197,94,0.1)"
+                    : "rgba(255,255,255,0.03)",
+                  borderRadius: 10,
+                  border: complete
+                    ? "1px solid rgba(34,197,94,0.3)"
+                    : "1px solid rgba(255,255,255,0.08)",
+                }}
+              >
+                <div
+                  style={{
+                    fontSize: 11,
+                    fontWeight: 700,
+                    color: complete ? "#22c55e" : "rgba(255,255,255,0.4)",
+                    textTransform: "uppercase",
+                    letterSpacing: 1,
+                    marginBottom: 6,
+                  }}
+                >
+                  {complete ? "â Win Condition Met" : "Win Condition"}
+                </div>
+                <div
+                  style={{
+                    fontSize: 14,
+                    color: complete ? "#22c55e" : "rgba(255,255,255,0.7)",
+                   lineHeight: 1.5,
+                  }}
+                >
+                  {level.winCondition}
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      }
+
+      // HOME SCREEN
+      return (
+        <div
+          style={{
+            maxWidth: 480,
+            margin: "0 auto",
+            minHeight: "100vh",
+            background: "#0a0a0a",
+            color: "#f3f4f6",
+            fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+          }}
+        >
+          <div style={{ padding: "32px 20px 12px" }}>
+            <div
+              style={{
+                fontSize: 11,
+                fontWeight: 700,
+                color: "#f59e0b",
+                textTransform: "uppercase",
+                letterSpacing: 2,
+                marginBottom: 6,
+              }}
+            >
+              AI FOR RETARDS
+            </div>
+            <h1
+              style={{
+                fontSize: 28,
+                fontWeight: 800,
+                lineHeight: 1.2,
+                margin: 0,
+                marginBottom: 8,
+              }}
+            >
+              The AI App Builder
+            </h1>
+            <p
+              style={{
+                fontSize: 14,
+                color: "rgba(255,255,255,0.5)",
+                margin: 0,
+                marginBottom: 20,
+                lineHeight: 1.5,
+              }}
+            >
+              7 levels. Copy-paste prompts. No code required. Build a real app.
+            </p>
+
+            <div
+              style={{
+                padding: "12px 16px",
+                background: "rgba(139,92,246,0.12)",
+                border: "1px solid rgba(139,92,246,0.3)",
+                borderRadius: 10,
+                marginBottom: 20,
+                display: "flex",
+                alignItems: "flex-start",
+                gap: 10,
+              }}
+            >
+              <span style={{ fontSize: 20, lineHeight: 1 }}>ðï¸</span>
+              <div>
+                <div style={{ fontSize: 14, fontWeight: 700, color: "#a78bfa", marginBottom: 4 }}>
+                  USE VOICE MODE
+                </div>
+                <div style={{ fontSize: 13, color: "rgba(255,255,255,0.6)", lineHeight: 1.5 }}>
+                  When you copy a prompt and open Claude, tap the microphone and TALK your answers instead of typing. Fill in the [BRACKETS] by speaking â it's 10x faster. Claude understands voice perfectly. Don't sit there typing paragraphs with your thumbs.
+                </div>
+              </div>
+            </div>
+
+            <div
+              style={{
+                height: 8,
+                background: "rgba(255,255,255,0.1)",
+                borderRadius: 4,
+                marginBottom: 6,
+                overflow: "hidden",
+              }}
+            >
+              <div
+                style={{
+                  height: "100%",
+                  width: `${overallProgress}%`,
+                  background: "linear-gradient(90deg, #f59e0b, #22c55e)",
+                  borderRadius: 4,
+                  transition: "width 0.3s",
+                }}
+              />
+            </div>
+            <div
+              style={{
+                fontSize: 12,
+                color: "rgba(255,255,255,0.4)",
+                marginBottom: 24,
+                textAlign: "right",
+              }}
+            >
+              {completedTasks}/{totalTasks} tasks complete
+            </div>
+          </div>
+
+          <div style={{ padding: "0 20px 20px" }}>
+            {LEVELS.map((level, index) => (
+              <LevelCard
+                key={level.id}
+                level={level}
+                isActive={false}
+                isComplete={isLevelComplete(level)}
+                isLocked={!isLevelUnlocked(level, index)}
+                progress={getLevelProgress(level)}
+                onClick={(l) => {
+                  setActiveLevel(l);
+                  scrollToTop();
+                }}
+              />
+            ))}
+
+            <button
+              onClick={() => setShowNumbers(!showNumbers)}
+              style={{
+                width: "100%",
+                padding: 16,
+                background: "rgba(255,255,255,0.03)",
+                border: "1px solid rgba(255,255,255,0.08)",
+                borderRadius: 12,
+                color: "#f3f4f6",
+                fontSize: 15,
+                fontWeight: 600,
+                cursor: "pointer",
+                marginTop: 8,
+                display: "flex",
+                alignItems: "center",
+                gap: 10,
+              }}
+            >
+              <span>ð</span>
+              <span>Know Your Numbers</span>
+              <span style={{ marginLeft: "auto", fontSize: 18 }}>
+                {showNumbers ? "â" : "+"}
+              </span>
+            </button>
+            {showNumbers && <NumbersView />}
+
+            <div
+              style={{
+                marginTop: 32,
+                padding: 20,
+                textAlign: "center",
+                borderTop: "1px solid rgba(255,255,255,0.06)",
+              }}
+            >
+              <div style={{ fontSize: 12, color: "rgba(255,255,255,0.25)" }}>
+                Built for AI for Retards by Daniel Coffeen
+              </div>
+              <a
+                href="https://replit.com/refer/coffeengroupai"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  display: "inline-block",
+                  fontSize: 11,
+                  color: "#8b5cf6",
+                  marginTop: 8,
+                  textDecoration: "underline",
+                }}
+              >
+                Need a Replit account? Sign up here (free)
+              </a>
+              <div
+                style={{
+                  fontSize: 11,
+                  color: "rgba(255,255,255,0.15)",
+                  marginTop: 4,
+                }}
+              >
+                No theory. Just execution.
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // Render 
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(React.createElement(App));
+  </script>
+</body>
+</html>
